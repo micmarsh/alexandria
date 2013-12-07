@@ -42,27 +42,15 @@
 (defn section-streams [sections]
     (map #(.getInputStream %) sections))
 
-(ann ^:no-check read-part
-    (Fn [java.io.Reader -> String]
-        [java.io.Reader AnyInteger -> String]))
-(defn read-part
-    ([read-me]
-        (read-part read-me 0))
-    ([read-me offset]
-        (let [length 1000
-              characters (char-array length)]
-            (.read read-me characters offset length)
-            (apply str characters))))
-
 ;(ann section-map [java.io.InputStream -> (HMap (something))])
 (defn section-map [xml-stream]
     (->> xml-stream
         slurp
-        ($x "//child::p")));;zip/xml-zip))
+        ($x "//child::p")))
 
 (ann book-stream [String -> (NonEmptyLazySeq String)])
-(defn book-stream [book-name]
-    (let [book (open-book book-name)
+(defn book-char-stream [book-name]
+    (let [book (if (string? book-name) (open-book book-name) book-name)
         ;TODO this^ book is actually an Option
           sections (contents book)
         ;TODO these^ sections are also an Option
@@ -71,7 +59,7 @@
           xml-maps (map section-map streams)
         ; probably not an Option, but beware^
         ]
-        (mapcat #(map :text %) xml-maps)))
+        (mapcat :text (flatten xml-maps))))
 
 ;Okay, so ideally you want to provide a layer of abstraction where you can open
 ; a book-stream with one function. The layers involved Book -> Resources
