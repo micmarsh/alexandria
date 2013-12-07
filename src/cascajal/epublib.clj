@@ -10,6 +10,9 @@
 (def-alias Book nl.siegmann.epublib.domain.Book)
 (def-alias Section nl.siegmann.epublib.domain.Resource)
 
+(def-alias StringSeq (NonEmptyLazySeq String))
+(def-alias CharSeq (NonEmptyLazySeq Character))
+
 (ann reader Reader)
 (def ^:private reader (EpubReader.))
 
@@ -20,7 +23,7 @@
         (java.io.FileInputStream. name)))
 
 ;(ann Book/getContents [-> (Seqable Resource)])
-(ann ^:no-check contents [Book -> (Option (Vec Section))])
+(ann ^:no-check contents [Book -> (Vec Section)])
 (defn contents [book]
     (vec (.getContents book)))
 
@@ -29,16 +32,15 @@
 (defn section-streams [sections]
     (map #(.getInputStream %) sections))
 
-;(ann section-map [java.io.InputStream -> (HMap (something))])
+(ann ^:no-check section-map [java.io.InputStream -> Seqable])
 (defn section-map [xml-stream]
     (->> xml-stream
         slurp
         ($x "//child::p")))
 
-(ann ^:no-check book-stream [Book -> (NonEmptyLazySeq Char)])
-(defn  get-char-stream [book]
+(ann get-char-stream [Book -> CharSeq])
+(defn-  get-char-stream [book]
     (let [sections (contents book)
-        ;TODO these^ sections are also an Option
           streams (section-streams sections)
         ;TODO each stream^ is an Option
           xml-maps (map section-map streams)
@@ -46,9 +48,11 @@
         ]
         (mapcat :text (flatten xml-maps))))
 
-(defn get-title [book]
-    (.getTitle book))
-
+(ann to-strings
+    (Fn [CharSeq
+            -> StringSeq]
+        [CharSeq AnyInteger
+            -> StringSeq]))
 (defn- to-strings
     ([char-stream]
         (to-strings char-stream 1000))
@@ -57,8 +61,12 @@
             (apply str (take length char-stream))
             (lazy-seq
                 (to-strings (drop length char-stream) length)))))
-
+(ann get-text [Book -> StringSeq])
 (def get-text (comp to-strings get-char-stream))
+
+(ann ^:no-check get-title [Book -> (Option String)])
+(defn get-title [book]
+    (.getTitle book))
 
 ;Okay, so ideally you want to provide a layer of abstraction where you can open
 ; a book-stream with one function. The layers involved Book -> Resources
