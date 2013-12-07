@@ -30,6 +30,6 @@
         (java.io.FileInputStream. name)))
 
 ;(ann Book/getContents [-> (Seqable Resource)])
-(ann ^:no-check contents [Book -> (Option (Seqable Resource))])
+(ann ^:no-check contents [Book -> (Option (Vec Resource))])
 (defjava contents [book]
-    (.getContents book))
+    (vec (.getContents book)))

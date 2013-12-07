@@ -7,7 +7,7 @@
 
 (ann -main [-> nil])
 (defn -main []
-    (let [book-name "sampldes/1984.epub"
+    (let [book-name "samples/1984.epub"
           book (open-book book-name)]
           (if book (do-stuff book)
             (println "error opening book"))))
