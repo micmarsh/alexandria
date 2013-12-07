@@ -19,7 +19,9 @@
         (try
             (~@body)
             (catch Exception e#
-                (identity nil)))))
+                (do
+                    (println (.getMessage e#))
+                    nil)))))
 
 ;(ann .readEpub [Reader java.io.FileInputStream -> Book])
 (ann ^:no-check open-book [String -> (Option Book)])
