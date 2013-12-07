@@ -47,6 +47,6 @@
         (read-part read-me 0))
     ([read-me offset]
         (let [length 100
-              characters (make-array Character length)]
+              characters (char-array length)]
             (.read read-me characters offset length)
             (apply str characters))))

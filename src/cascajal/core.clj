@@ -1,12 +1,16 @@
 (ns cascajal.core
-    (:use [cascajal.epublib :only [open-book contents section-titles Book]]
+    (:use [cascajal.epublib :only [open-book contents read-part section-titles Book]]
         clojure.core.typed))
 
 (ann do-stuff [Book -> nil])
 (defn do-stuff [b]
     (let [sections (contents b)]
         (if sections
-            (println (section-titles sections))
+            (let [readers (section-titles sections)
+                  a-reader (first readers)
+                  n (println readers)
+                  string (if a-reader (read-part a-reader) "nope")]
+                  (println string))
             (println "U got a nil sections"))))
 
 (ann -main [-> nil])
