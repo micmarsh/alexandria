@@ -12,6 +12,9 @@
 (def ^:private reader (EpubReader.))
 
 (defmacro defjava [name args body]
+    "Define a function that returns nil instead of throwing exceptions,
+    so we can have a meaningful Option type. Right now used just for java
+    interop, hence the name"
     `(defn ~name ~args
         (try
             (~@body)
