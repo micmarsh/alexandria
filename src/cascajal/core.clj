@@ -1,7 +1,8 @@
 (ns cascajal.core
     (:use [cascajal.epublib :only
         [open-book book-stream Book]]
-        clojure.core.typed))
+        clojure.core.typed
+        clojure.pprint))
 
 (ann do-stuff [Book -> nil])
 (defn do-stuff [b]
@@ -16,8 +17,8 @@
 
 (ann -main [-> nil])
 (defn -main []
-    (let [book-name "samples/1984.epub"
+    (let [book-name "samples/seven-habits.epub"
           book (open-book book-name)]
           (if book
-            (println  (book-stream book-name))
+            (pprint  (book-stream book-name))
             (println "error opening book"))))

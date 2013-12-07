@@ -67,8 +67,10 @@
         ;TODO these^ sections are also an Option
           streams (section-streams sections)
         ;TODO each stream^ is an Option
+          xml-maps (map section-map streams)
+        ; probably not an Option, but beware^
         ]
-        (map section-map streams)))
+        (second (rest xml-maps)) ))
 
 ;Okay, so ideally you want to provide a layer of abstraction where you can open
 ; a book-stream with one function. The layers involved Book -> Resources
