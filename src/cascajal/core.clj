@@ -1,36 +1,6 @@
 (ns cascajal.core
-    (:use clojure.core.typed))
-
-;epublib
-(import [nl.siegmann.epublib.epub EpubReader])
-
-(def-alias Reader nl.siegmann.epublib.epub.EpubReader)
-(def-alias Book nl.siegmann.epublib.domain.Book)
-(def-alias Resource nl.siegmann.epublib.domain.Resource)
-
-(ann reader Reader)
-(def ^:private reader (EpubReader.))
-
-(defmacro defjava [name args body]
-    "Define a function that returns nil instead of throwing exceptions,
-    so we can have a meaningful Option type. Right now used just for java
-    interop, hence the name"
-    `(defn ~name ~args
-        (try
-            (~@body)
-            (catch Exception e#
-                (identity nil)))))
-
-;(ann .readEpub [Reader java.io.FileInputStream -> Book])
-(ann ^:no-check open-book [String -> (Option Book)])
-(defjava open-book [name]
-    (.readEpub reader
-        (java.io.FileInputStream. name)))
-
-;(ann Book/getContents [-> (Seqable Resource)])
-(ann ^:no-check contents [Book -> (Option (Seqable Resource))])
-(defjava contents [book]
-    (.getContents book))
+    (:use [cascajal.epublib :only [open-book contents Book]]
+        clojure.core.typed))
 
 (ann do-stuff [Book -> nil])
 (defn do-stuff [b] (println (contents b)))
