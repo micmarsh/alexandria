@@ -6,29 +6,25 @@
 
 (import [nl.siegmann.epublib.epub EpubReader])
 
-(def-alias Reader nl.siegmann.epublib.epub.EpubReader)
 (def-alias Book nl.siegmann.epublib.domain.Book)
-(def-alias Section nl.siegmann.epublib.domain.Resource)
+(def-alias Resource nl.siegmann.epublib.domain.Resource)
 
 (def-alias StringSeq (NonEmptyLazySeq String))
 (def-alias CharSeq (NonEmptyLazySeq Character))
 
-(ann reader Reader)
-(def ^:private reader (EpubReader.))
-
-;(ann .readEpub [Reader java.io.FileInputStream -> Book])
 (ann ^:no-check open-book [String -> (Option Book)])
-(defn open-book [name]
-    (.readEpub reader
-        (java.io.FileInputStream. name)))
+(def open-book
+    (let [reader (EpubReader.)]
+        (fn [name]
+            (.readEpub reader
+                (java.io.FileInputStream. name)))))
 
-;(ann Book/getContents [-> (Seqable Resource)])
-(ann ^:no-check contents [Book -> (Vec Section)])
+(ann ^:no-check contents [Book -> (Vec Resource)])
 (defn contents [book]
     (vec (.getContents book)))
 
 (ann ^:no-check section-streams
-    [(Vec Section) -> (Seqable (Option java.io.InputStream))])
+    [(Vec Resource) -> (Seqable (Option java.io.InputStream))])
 (defn section-streams [sections]
     (map #(.getInputStream %) sections))
 
@@ -49,10 +45,8 @@
         (mapcat :text (flatten xml-maps))))
 
 (ann to-strings
-    (Fn [CharSeq
-            -> StringSeq]
-        [CharSeq AnyInteger
-            -> StringSeq]))
+    (Fn [CharSeq -> StringSeq]
+        [CharSeq AnyInteger -> StringSeq]))
 (defn- to-strings
     ([char-stream]
         (to-strings char-stream 1000))
@@ -61,6 +55,7 @@
             (apply str (take length char-stream))
             (lazy-seq
                 (to-strings (drop length char-stream) length)))))
+
 (ann get-text [Book -> StringSeq])
 (def get-text (comp to-strings get-char-stream))
 
