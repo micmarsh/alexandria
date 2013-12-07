@@ -1,12 +1,9 @@
-(ns cascajal.core)
+(ns cascajal.core
+    (:use clojure.core.typed))
 
 ;epublib
 (import [nl.siegmann.epublib.epub EpubReader])
 
-(defn foo
-  "I don't do a whole lot."
-  [x]
-  (println x "Hello, World!"))
-
+(ann -main [-> nil])
 (defn -main []
     (println "yo"))
