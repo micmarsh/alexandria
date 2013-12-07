@@ -9,27 +9,20 @@
 (def-alias Book nl.siegmann.epublib.domain.Book)
 (def-alias Resource nl.siegmann.epublib.domain.Resource)
 
-(def-alias StringSeq (NonEmptyLazySeq String))
-(def-alias CharSeq (NonEmptyLazySeq Character))
-
-(ann ^:no-check open-book [String -> (Option Book)])
-(def open-book
-    (let [reader (EpubReader.)]
-        (fn [name]
-            (.readEpub reader
-                (java.io.FileInputStream. name)))))
+(def-alias StringSeq (clojure.lang.LazySeq String))
+(def-alias CharSeq (clojure.lang.LazySeq Character))
 
 (ann ^:no-check contents [Book -> (Vec Resource)])
-(defn contents [book]
+(defn- contents [book]
     (vec (.getContents book)))
 
-(ann ^:no-check section-streams
+(ann ^:no-check resource-streams
     [(Vec Resource) -> (Seqable (Option java.io.InputStream))])
-(defn section-streams [sections]
+(defn- resource-streams [sections]
     (map #(.getInputStream %) sections))
 
 (ann ^:no-check section-map [java.io.InputStream -> Seqable])
-(defn section-map [xml-stream]
+(defn- section-map [xml-stream]
     (->> xml-stream
         slurp
         ($x "//child::p")))
@@ -37,13 +30,17 @@
 (ann get-char-stream [Book -> CharSeq])
 (defn-  get-char-stream [book]
     (let [sections (contents book)
-          streams (section-streams sections)
+          streams (resource-streams sections)
         ;TODO each stream^ is an Option
           xml-maps (map section-map streams)
         ; probably not an Option, but beware^
         ]
         (mapcat :text (flatten xml-maps))))
 
+(def-alias Piece [AnyInteger CharSeq -> CharSeq] )
+(ann clojure.core/take Piece)
+(ann clojure.core/drop Piece)
+(ann clojure.core/cons [String StringSeq -> StringSeq])
 (ann to-strings
     (Fn [CharSeq -> StringSeq]
         [CharSeq AnyInteger -> StringSeq]))
@@ -55,6 +52,13 @@
             (apply str (take length char-stream))
             (lazy-seq
                 (to-strings (drop length char-stream) length)))))
+
+(ann ^:no-check open-book [String -> (Option Book)])
+(def open-book
+    (let [reader (EpubReader.)]
+        (fn [name]
+            (.readEpub reader
+                (java.io.FileInputStream. name)))))
 
 (ann get-text [Book -> StringSeq])
 (def get-text (comp to-strings get-char-stream))
