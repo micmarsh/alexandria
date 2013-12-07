@@ -5,7 +5,7 @@
 
 (def-alias Reader nl.siegmann.epublib.epub.EpubReader)
 (def-alias Book nl.siegmann.epublib.domain.Book)
-(def-alias Resource nl.siegmann.epublib.domain.Resource)
+(def-alias Section nl.siegmann.epublib.domain.Resource)
 
 (ann reader Reader)
 (def ^:private reader (EpubReader.))
@@ -30,6 +30,23 @@
         (java.io.FileInputStream. name)))
 
 ;(ann Book/getContents [-> (Seqable Resource)])
-(ann ^:no-check contents [Book -> (Option (Vec Resource))])
+(ann ^:no-check contents [Book -> (Option (Vec Section))])
 (defjava contents [book]
     (vec (.getContents book)))
+
+(ann ^:no-check section-titles
+    [(Vec Section) -> (Seqable (Option java.io.Reader))])
+(defjava section-titles [sections]
+    (map #(.getReader %) sections))
+
+(ann ^:no-check read-part
+    (Fn [java.io.Reader -> String]
+        [java.io.Reader AnyInteger -> String]))
+(defn read-part
+    ([read-me]
+        (read-part read-me 0))
+    ([read-me offset]
+        (let [length 100
+              characters (make-array Character length)]
+            (.read read-me characters offset length)
+            (apply str characters))))
