@@ -26,7 +26,7 @@
 
 ;(ann Book/getContents [-> (Seqable Resource)])
 (ann ^:no-check contents [Book -> (Option (Seqable Resource))])
-(defn contents [book]
+(defjava contents [book]
     (.getContents book))
 
 (ann do-stuff [Book -> nil])
@@ -34,7 +34,7 @@
 
 (ann -main [-> nil])
 (defn -main []
-    (let [book-name "samples/19d84.epub"
+    (let [book-name "samples/1984.epub"
           book (open-book book-name)]
           (if book (do-stuff book)
             (println "error opening book"))))
