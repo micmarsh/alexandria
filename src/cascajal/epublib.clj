@@ -1,5 +1,6 @@
 (ns cascajal.epublib
-    (:use clojure.core.typed)
+    (:use clojure.core.typed
+            [clj-xpath.core :only [$x]])
     (:require [clojure.xml :as xml]
               [clojure.zip :as zip]))
 
@@ -55,9 +56,9 @@
 
 ;(ann section-map [java.io.InputStream -> (HMap (something))])
 (defn section-map [xml-stream]
-    (-> xml-stream
-        xml/parse
-        zip/xml-zip))
+    (->> xml-stream
+        slurp
+        ($x "//child::p")));;zip/xml-zip))
 
 (ann book-stream [String -> (NonEmptyLazySeq String)])
 (defn book-stream [book-name]
@@ -70,7 +71,7 @@
           xml-maps (map section-map streams)
         ; probably not an Option, but beware^
         ]
-        (second (rest xml-maps)) ))
+        (mapcat #(map :text %) xml-maps)))
 
 ;Okay, so ideally you want to provide a layer of abstraction where you can open
 ; a book-stream with one function. The layers involved Book -> Resources
