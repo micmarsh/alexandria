@@ -13,19 +13,6 @@
 (ann reader Reader)
 (def ^:private reader (EpubReader.))
 
-(defmacro defjava
-    "Define a function that returns nil instead of throwing exceptions,
-    so we can have a meaningful Option type. Right now used just for java
-    interop, hence the name"
-    [name args body]
-    `(defn ~name ~args
-        (try
-            (~@body)
-            (catch Exception e#
-                (do
-                    (println (.getMessage e#))
-                    nil)))))
-
 ;(ann .readEpub [Reader java.io.FileInputStream -> Book])
 (ann ^:no-check open-book [String -> (Option Book)])
 (defn open-book [name]
@@ -48,8 +35,8 @@
         slurp
         ($x "//child::p")))
 
-(ann book-stream [String -> (NonEmptyLazySeq String)])
-(defn get-char-stream [book]
+(ann ^:no-check book-stream [Book -> (NonEmptyLazySeq Char)])
+(defn  get-char-stream [book]
     (let [sections (contents book)
         ;TODO these^ sections are also an Option
           streams (section-streams sections)
@@ -58,6 +45,20 @@
         ; probably not an Option, but beware^
         ]
         (mapcat :text (flatten xml-maps))))
+
+(defn get-title [book]
+    (.getTitle book))
+
+(defn- to-strings
+    ([char-stream]
+        (to-strings char-stream 1000))
+    ([char-stream length]
+        (cons
+            (apply str (take length char-stream))
+            (lazy-seq
+                (to-strings (drop length char-stream) length)))))
+
+(def get-text (comp to-strings get-char-stream))
 
 ;Okay, so ideally you want to provide a layer of abstraction where you can open
 ; a book-stream with one function. The layers involved Book -> Resources
