@@ -49,10 +49,8 @@
         ($x "//child::p")))
 
 (ann book-stream [String -> (NonEmptyLazySeq String)])
-(defn book-char-stream [book-name]
-    (let [book (if (string? book-name) (open-book book-name) book-name)
-        ;TODO this^ book is actually an Option
-          sections (contents book)
+(defn get-char-stream [book]
+    (let [sections (contents book)
         ;TODO these^ sections are also an Option
           streams (section-streams sections)
         ;TODO each stream^ is an Option

@@ -20,5 +20,5 @@
     (let [book-name "samples/1984.epub"
           book (open-book book-name)]
           (if book
-            (pprint  (book-char-stream book-name))
+            (pprint  (book-char-stream book))
             (println "error opening book"))))
