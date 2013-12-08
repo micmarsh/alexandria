@@ -1,35 +1,21 @@
 (ns alexandria.core
-    (:use [compojure.core :only [ANY GET POST defroutes]]
-        clojure.core.typed
-        ring.middleware.cors
-        org.httpkit.server)
-    (:require [compojure.handler :as handler]
-            [compojure.route :as route]
-            [ring.middleware.reload :as reload]))
+    (:use clojure.core.typed
+        org.httpkit.server
+        alexandria.server.types
+        [alexandria.server :only [app]]))
 
-(def-alias ServerThing Any)
-
-(ann ^:no-check routes ServerThing)
-(defroutes routes
-    (ANY "/" [] "woffffooo")
-    (route/resources "/"))
-
-(ann ^:no-check app ServerThing)
-(def app
-    (-> routes
-        handler/site
-        reload/wrap-reload
-    (wrap-cors
-        :access-control-allow-origin #".+")))
+(ann org.httpkit.server/run-server
+    [ServerThing
+    (HMap :mandatory
+        {:port AnyInteger :join? Boolean})
+        -> nil])
+;doesn't seem like you should have to do this
+(ann ^:no-check alexandria.server/app
+    ServerThing)
 
 (ann ^:no-check to-int [String -> AnyInteger])
 (defn to-int [str]
     (Integer. str))
-
-(ann org.httpkit.server/run-server
-    [ServerThing
-    (HMap :mandatory {:port AnyInteger :join? Boolean})
-        -> nil])
 
 (ann -main
     (Fn [-> nil]
