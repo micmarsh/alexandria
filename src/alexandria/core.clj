@@ -1,4 +1,4 @@
-(ns cascajal.core
+(ns alexandria.core
     (:use [compojure.core :only [ANY GET POST defroutes]]
         clojure.core.typed
         ring.middleware.cors

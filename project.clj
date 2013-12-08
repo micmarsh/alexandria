@@ -1,4 +1,4 @@
-(defproject cascajal "0.1.0-SNAPSHOT"
+(defproject alexandria "0.1.0-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -14,6 +14,6 @@
                 [hiccup "1.0.4"]
                 [garden "1.1.3"]]
   :plugins [[lein-localrepo "0.4.0"]]
-  :main cascajal.core
+  :main alexandria.core
 )
 
