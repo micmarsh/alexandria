@@ -1,13 +1,43 @@
 (ns cascajal.core
-    (:use [cascajal.epublib :only
-        [open-book get-text get-title Book]]
+    (:use [compojure.core :only [ANY GET POST defroutes]]
         clojure.core.typed
-        clojure.pprint))
+        ring.middleware.cors
+        org.httpkit.server)
+    (:require [compojure.handler :as handler]
+            [compojure.route :as route]
+            [ring.middleware.reload :as reload]))
 
-(ann -main [-> nil])
-(defn -main []
-    (let [book-name "samples/seven-habits.epub"
-          book (open-book book-name)]
-          (if book
-            (pprint  (get-text book));(to-strings (get-char-stream book)))
-            (println "error opening book"))))
+(def-alias ServerThing Any)
+
+(ann ^:no-check routes ServerThing)
+(defroutes routes
+    (ANY "/" [] "woffffooo")
+    (route/resources "/"))
+
+(ann ^:no-check app ServerThing)
+(def app
+    (-> routes
+        handler/site
+        reload/wrap-reload
+    (wrap-cors
+        :access-control-allow-origin #".+")))
+
+(ann ^:no-check to-int [String -> AnyInteger])
+(defn to-int [str]
+    (Integer. str))
+
+(ann org.httpkit.server/run-server
+    [ServerThing
+    (HMap :mandatory {:port AnyInteger :join? Boolean})
+        -> nil])
+
+(ann -main
+    (Fn [-> nil]
+        [String -> nil]))
+(defn -main
+    ([]
+        (-main "3000"))
+    ([port] ;heroku!
+        (println (str "Running server on port " port))
+        (run-server app
+            {:port (to-int port) :join? false})))
