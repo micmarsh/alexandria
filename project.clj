@@ -14,6 +14,7 @@
                 [hiccup "1.0.4"]
                 [garden "1.1.3"]]
   :plugins [[lein-localrepo "0.4.0"]]
+  :min-lein-version "2.0"
   :main alexandria.core
 )
 
