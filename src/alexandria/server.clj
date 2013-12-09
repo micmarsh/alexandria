@@ -1,6 +1,6 @@
 (ns alexandria.server
     (:use [compojure.core :only [ANY GET POST defroutes]]
-          [alexandria.server.resources :only [all-books]]
+          [alexandria.server.resources :only [all-books read-book]]
           clojure.core.typed
           alexandria.server.types
           ring.middleware.cors)
@@ -11,6 +11,8 @@
 (ann ^:no-check routes ServerThing)
 (defroutes routes
     (ANY "/" [] all-books)
+    (ANY "/books" [] all-books)
+    (ANY "/books/:id" [] read-book)
     (route/resources "/"))
 
 (ann ^:no-check app ServerThing)

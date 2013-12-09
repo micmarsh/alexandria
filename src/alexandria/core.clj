@@ -1,7 +1,7 @@
 (ns alexandria.core
     (:use clojure.core.typed
         org.httpkit.server
-        alexandria.server.types
+        [alexandria.server.types :only [ServerThing]]
         [alexandria.server :only [app]]))
 
 (ann org.httpkit.server/run-server
@@ -18,7 +18,7 @@
     (Integer. str))
 
 (ann -main
-    (Fn [-> nil]
+    (Fn [ -> nil]
         [String -> nil]))
 (defn -main
     ([]
