@@ -50,10 +50,10 @@
                 (let [book (open-book book-file)
                       title (get-title book)
                       id (file-to-id book-file)]
-                [:li
-                    [:a
-                        {:href (str "/books/" id)}
-                        title]]))]]))
+                  [:li
+                      [:a
+                          {:href (str "/books/" id)}
+                          title]]))]]))
 
 (defn book-text [id]
     (let [book-file (lookup-book id)
@@ -64,7 +64,6 @@
 
 (defn book-page [id]
     (-> id book-text add-header))
-
 
 (def books-page
     (comp
